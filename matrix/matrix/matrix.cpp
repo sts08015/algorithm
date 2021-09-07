@@ -1,6 +1,6 @@
 ﻿#include <iostream>
 #include <time.h>
-#define N 1500
+#define N 13377
 
 int arr1[N][N];
 int arr2[N][N];
