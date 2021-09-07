@@ -1,0 +1,22 @@
+#ignore .sln
+/**/*sln
+
+#ignore Debug
+Debug/
+/**/Debug
+
+#ignore Release
+Release/
+/**/Release
+
+#ignore vcxproj
+/**/*vcxproj*
+
+#ignore x64
+x64/
+
+#ignore .vs
+.vs/
+
+#ignore enc_temp_folder
+/**/enc_temp_folder/
