@@ -1,7 +1,7 @@
 ﻿#include <iostream>
 #include <iomanip>
 #include <ctime>
-#define N 13377
+#define N 13378
 
 int arr1[N][N];
 int arr2[N][N];
@@ -29,7 +29,7 @@ void reset()
             ans[i][j] = 0;
 }
 
-void row_mul_1()    //kji
+void col_mul_1()    //kji
 {
     for (int k = 0; k < N; k++)
         for (int j = 0; j < N; j++)
@@ -39,7 +39,7 @@ void row_mul_1()    //kji
             }
 }
 
-void row_mul_2()    //jki
+void col_mul_2()    //jki
 {
     for (int j = 0; j < N; j++)
         for (int k = 0; k < N; k++)
@@ -69,7 +69,7 @@ void mix_mul_2()    //jik
             }
 }
 
-void col_mul_1()    //kij
+void row_mul_1()    //kij
 {
     for (int k = 0; k < N; k++)
         for (int i = 0; i < N; i++)
@@ -79,7 +79,7 @@ void col_mul_1()    //kij
             }
 }
 
-void col_mul_2()    //ikj
+void row_mul_2()    //ikj
 {
     for (int i = 0; i < N; i++)
         for (int k = 0; k < N; k++)
@@ -96,14 +96,14 @@ void test_row()
     start = clock();
     row_mul_1();
     end = clock();
-    result = (double)(end - start)/CLOCKS_PER_SEC;
+    result = (double)(end - start) / CLOCKS_PER_SEC;
     cout << "row result 1: " << result << " s" << endl;
     reset();
 
     start = clock();
     row_mul_2();
     end = clock();
-    result = (double)(end - start)/CLOCKS_PER_SEC;
+    result = (double)(end - start) / CLOCKS_PER_SEC;
     cout << "row result 2: " << result << " s" << endl;
     reset();
 
@@ -138,14 +138,14 @@ void test_col()
     start = clock();
     col_mul_1();
     end = clock();
-    result = (double)(end - start)/CLOCKS_PER_SEC;
+    result = (double)(end - start) / CLOCKS_PER_SEC;
     cout << "col result 1: " << result << " s" << endl;
     reset();
 
     start = clock();
     col_mul_2();
     end = clock();
-    result = (double)(end - start)/CLOCKS_PER_SEC;
+    result = (double)(end - start) / CLOCKS_PER_SEC;
     cout << "col result 2: " << result << " s" << endl;
     reset();
 
