@@ -1,7 +1,7 @@
 ﻿#include <iostream>
 #include <iomanip>
 #include <ctime>
-#define N 13378
+#define N 13377
 
 int arr1[N][N];
 int arr2[N][N];
