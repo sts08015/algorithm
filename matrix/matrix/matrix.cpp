@@ -1,5 +1,6 @@
 ﻿#include <iostream>
-#include <time.h>
+#include <iomanip>
+#include <ctime>
 #define N 13377
 
 int arr1[N][N];
@@ -160,6 +161,7 @@ void test()
 
 int main(void)
 {
+    cout << std::fixed << std::setprecision(3);
     init();
     test();
     return 0;
