@@ -4,31 +4,33 @@
 #include <random>
 #include <chrono>
 
-#define REPEAT 1
+#define REPEAT 5
 using namespace std;
+
+random_device rd;
+mt19937 gen(rd());
+uniform_int_distribution<int> dis(-99999, 99999);
 
 //1000,10000,50000,100000,500000,1000000
 
 void Sort(int* arr,int len,void (*algo)(int*,int),const char* name)
 {
-  double avg;
-  int* brr = (int*)malloc(sizeof(int)*len);
+  double avg = 0;
 
   for(int i=0;i<REPEAT;i++)
   {
-    memcpy(brr,arr,sizeof(int)*len);
-
     chrono::time_point<chrono::high_resolution_clock> start = chrono::high_resolution_clock::now();
     algo(arr,len);
     chrono::time_point<std::chrono::high_resolution_clock> end = chrono::high_resolution_clock::now();
     chrono::duration<double> diff = end-start;
 
     avg += chrono::duration_cast<chrono::microseconds>(diff).count();
+
+    for(int i=0;i<len;i++) arr[i] = dis(gen);
   }
 
   avg /= REPEAT;
-  //cout << name << ": " << avg <<endl;
-  free(brr);
+  cout << name << ": " << avg <<endl;
 }
 
 void swap(int& a,int& b)
@@ -60,27 +62,124 @@ void Bubble_Sort(int* arr,int len)
       if(arr[j] > arr[j+1]) swap(arr[j],arr[j+1]);
 }
 
+int partition(int* arr,int left, int right)
+{
+  int pivot = right;
+  int i = left;
+  int j = pivot;
+
+  while(i < j)
+  {
+    while(arr[i] < arr[pivot]) i++;
+    while(arr[j] >= arr[pivot] && i<j) j--;
+    swap(arr[i],arr[j]);
+  }
+  swap(arr[i],arr[pivot]);
+  return i;
+}
+
+void qsort(int* arr,int left, int right)
+{
+  if(left < right)
+  {
+    int q = partition(arr,left,right);
+    qsort(arr,left,q-1);
+    qsort(arr,q+1,right);
+  }
+}
+
 void Quick_Sort(int* arr,int len)
 {
+  qsort(arr,0,len-1);
+}
 
+void Build_MaxHeap(int* arr,int* brr,int len)
+{
+  int heap_size = 0;
+
+  for(int i=0;i<len;i++)
+  {
+    heap_size++;
+    brr[heap_size] = arr[i];
+    int idx = heap_size;
+    int parent = idx/2;
+    while(parent>=1)
+    {
+      if(brr[idx] > brr[parent])
+      {
+        swap(brr[idx],brr[parent]);
+        idx = parent;
+        parent /= 2;
+      }
+      else break;
+    }
+  }
+
+}
+
+void delete_heap(int* arr,int len)
+{
+  int idx = 1;
+  int left = -1;
+  int right = -1;
+
+  while(idx*2 <= len)
+  {
+    if(idx*2 + 1 > len) right = -1;
+    else right = idx*2 + 1;
+
+    left = idx*2;
+
+    if(right == -1)
+    {
+      if(arr[idx] < arr[left])
+      {
+        swap(arr[idx],arr[left]);
+        idx = left;
+      }
+      else break;
+    }
+    else
+    {
+      if(arr[idx] < arr[left] || arr[idx] < arr[right])
+      {
+        if(arr[left] < arr[right])
+        {
+          swap(arr[idx],arr[right]);
+          idx = right;
+        }
+        else
+        {
+          swap(arr[idx],arr[left]);
+          idx = left;
+        }
+      }
+      else break;
+    }
+  }
+}
+
+void hsort(int* arr,int len)
+{
+  for(int i=1;i<=len;i++)
+  {
+    swap(arr[1],arr[len+1-i]);
+    delete_heap(arr,len-i);
+  }
 }
 
 void Heap_Sort(int* arr,int len)
 {
-
+  int* brr = (int *)malloc(sizeof(int)*(len+1));  // because initial index is 1 rather than 0
+  Build_MaxHeap(arr,brr,len);
+  hsort(brr,len); //sorting brr
+  free(brr);
 }
 
 void compare(int len)
 {
   int *arr = (int*)malloc(sizeof(int)*len);
-  random_device rd;
-  mt19937 gen(rd());
-  uniform_int_distribution<int> dis(0, 999);
-
   for(int i=0;i<len;i++) arr[i] = dis(gen);
-
-  puts("initial!!");
-  for(int i=0;i<len;i++) printf("%d\n",arr[i]);
 
   cout << "[SORTING COMPARE]" << endl;
   Sort(arr,len,Selection_Sort,"Selection_Sort");
