@@ -1,3 +1,5 @@
+CC = g++
+
 all: rbtree
 
 rbtree:

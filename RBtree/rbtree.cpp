@@ -7,7 +7,7 @@ int main(void)
   Node* Tree = NULL;
   int len = sizeof(arr)/sizeof(int);
 
-  for(int i=0;i<len;i++) Tree = insert(Tree,arr[i]);
+  //for(int i=0;i<len;i++) Tree = insert(Tree,arr[i]);
 
   return 0;
 }
