@@ -4,10 +4,25 @@
 int main(void)
 {
   const int arr[] = {1,2,4,5,9,0,6,3,7,8};
-  Node* Tree = NULL;
   int len = sizeof(arr)/sizeof(int);
 
-  //for(int i=0;i<len;i++) Tree = insert(Tree,arr[i]);
+  RBTree* Tree = initTree();
+
+  for(int i=0;i<len;i++) insert(Tree,arr[i]);
+
+
+  
+  puts("preorder");
+  traversal(Tree,PREORDER);
+  puts("");
+
+  puts("inorder");
+  traversal(Tree,INORDER);
+  puts("");
+
+  puts("postorder");
+  traversal(Tree,POSTORDER);
+  puts("");
 
   return 0;
 }

@@ -2,19 +2,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef enum color
+typedef enum _trav
+{
+  PREORDER,INORDER,POSTORDER
+}Traversal;
+
+typedef enum _color
 {
   RED,BLACK
 }COLOR;
 
 typedef struct _node
 {
-  struct _node *parent;
+  struct _node* parent;
   struct _node* left;
   struct _node* right;
   int val;
   COLOR color;
 }Node;
+
+typedef struct _rbtree
+{
+  Node* root;
+  Node* NIL;
+}RBTree;
 
 Node* makeNode(int num)
 {
@@ -23,125 +34,194 @@ Node* makeNode(int num)
   node->left = NULL;
   node->right = NULL;
   node->val = num;
-  node->color = RED;
+  node->color = RED;  //default : RED
   return node;
 }
 
-bool chkDRed(Node* p,Node *c)
+RBTree* initTree()
+{
+  RBTree* tree = (RBTree*)malloc(sizeof(RBTree));
+  Node* nil = makeNode(0);
+  //nil->left = nil;
+  //nil->right = nil;
+
+  tree->root = nil;
+  tree->NIL = nil;
+  return tree;
+}
+
+bool chkDRED(Node* p, Node*c)
 {
   if(p->color == RED && p->color == c->color) return true;
   else return false;
 }
 
-int* sortNode(Node* a,Node* b,Node *c)
+
+void leftRotation(Node* p, Node* c,RBTree* tree)
 {
-  static int arr[3] = {0};
-  arr[0] = a->val;
-  arr[1] = b->val;
-  arr[2] = c->val;
-  //bubble sort
-  for(int i=0;i<2;i++)
-    for(int j=0;j<2-i;j++)
-      if(arr[j] < arr[j+1])
-      {
-        int tmp = arr[j];
-        arr[j] = arr[j+1];
-        arr[j+1] = tmp;
-      }
-  return arr;
+  Node* gp = p->parent; // TODO : think when gp is NULL!
+  if(gp!=NULL)  //p is not root
+  {
+    bool chk = (gp->right == p);
+    if(chk) gp->right = c;
+    else gp->left = c;
+  }
+  else tree->root = c;
+  c->parent = gp;
+
+  p->right = c->left;
+  if(c->left!=tree->NIL) c->left->parent = p;
+
+  c->left = p;
+  p->parent = c;
 }
 
-Node* insert(Node* root,int num,int depth)
+void rightRotation(Node* p,Node* c, RBTree* tree)
 {
-  if(root == NULL)
+  Node* gp = p->parent;
+  if(gp!=NULL)
   {
-    Node* newNode = makeNode(num);
-    if(depth == 0) newNode->color = BLACK;  //real root node
-    return newNode;
+    bool chk = (gp->right == p);
+    if(chk) gp->right  = c;
+    else gp->left = c;
   }
-  else if(root->val < num)
+  else tree->root = c;
+  c->parent = gp;
+
+  p->left = c->right;
+  if(c->right!=tree->NIL) c->right->parent = p;
+
+  c->right = p;
+  p->parent = c;
+}
+
+void checkRules(RBTree* tree,Node* p,Node* c)
+{
+  if(chkDRED(p,c))  //if p is root, never satisfies
   {
-    root->right = insert(root->right,num);
-    root->right->parent = root;
-    if(chkDRed(root,root->right)) //double red
+    Node* gp = p->parent; //always exists(not NULL)
+    Node* u = NULL;
+    Node* tmp = NULL;
+
+    if(gp->right == p) u = gp->left;
+    else u = gp->right;
+
+    if(u->color == BLACK)
     {
-      if(root->parent->left == root)
+      if(gp->right == p)
       {
-        Node* c = root->right;
-        Node* gp = root->parent;
-        Node* u = root->parent->right;
-        if(u!=NULL) //if uncle exists
+        if(p->left == c) //case 2-1
         {
-          if(u->color == RED) //recolor
-          {
-            c->color = BLACK;
-            u->color = BLACK;
-            if(gp->parent == NULL) gp->color = BLACK;
-            else
-            {
-              gp->color = RED;
-              Node* cur = gp;
-
-              while(cur->parent!=NULL)
-              {
-                if(chkDRed(cur->parent,cur))
-                {
-                  //real root is always black so there always exsit cur->parent->parent
-                  Node* t_p = cur->parent;
-                  Node* t_gp = t_p->parent;
-                  Node* t_u;
-                  if(t_gp->right == t_p) t_u = t_gp->left;
-                  else t_u = t_gp->right;
-
-                  cur->color = BLACK;
-                  t_u->color = BLACK;
-                  t_gp->color = RED;
-
-                  cur = cur->parent->parent;
-                }
-                else break;
-              }
-
-            }
-          }
-          else  //reconstruct
-          {
-            const int* arr = sortNode(c,root,gp);
-            root->val = arr[0];
-            gp->val = arr[1];
-            int tmp = u->val;
-            u->val = arr[2];
-
-            Node* z = makeNode(tmp);
-            z->parent = u;
-            if(u->right!=NULL)
-            {
-              z->right = u->right;
-              u->right->parent = z;
-            }
-            u->right = z;
-
-            free(root->right);
-            root->right = NULL;
-          }
+          rightRotation(p,c,tree);
+          tmp = p;
+          p = c;
+          c = tmp;
         }
+        leftRotation(gp,p,tree);  //case 2-2
       }
       else
       {
-        //TODO
+        if(p->right == c)  //case 2-1
+        {
+          leftRotation(p,c,tree);
+          tmp = p;
+          p = c;
+          c = tmp;
+        }
+        rightRotation(gp,p,tree); //case 2-2
       }
+
+      tmp = gp;
+      gp = p;
+      p = tmp;
+      gp->color = BLACK;
+      p->color = RED;
     }
+    else  //case 1
+    {
+        //TODO
+    }
+  }
+}
+
+void insert(RBTree* tree, int num)
+{
+  Node* newNode = makeNode(num);
+  Node* p = NULL;
+  Node* c = tree->root;
+
+  bool flag = true; //to check left or right
+  while(c!=tree->NIL)
+  {
+    p = c;
+    if(num > c->val)
+    {
+      c = c->right;
+      flag = true;
+    }
+    else
+    {
+      c = c->left;
+      flag = false;
+    }
+  }
+  newNode->parent = p;
+  newNode->left = tree->NIL;
+  newNode->right = tree->NIL;
+
+  if(tree->root == tree->NIL)
+  {
+    newNode->color = BLACK; //root is BLACK
+    tree->root = newNode;
   }
   else
   {
-    root->left = insert(root->left,num);
-    root->left->parent = root;
-    if(chkDRed(root,root->left))
-    {
-      //TODO
-    }
-
+    if(flag) p->right = newNode;
+    else p->left = newNode;
   }
 
-  return root;
+  checkRules(tree,p,newNode);
+}
+
+
+void deletion()
+{
+  //TODO
+}
+
+void preorder(Node* root,Node* nil)
+{
+  if(root!=nil)
+  {
+    printf("%d ",root->val);
+    preorder(root->left,nil);
+    preorder(root->right,nil);
+  }
+}
+
+void inorder(Node* root,Node* nil)
+{
+  if(root!=nil)
+  {
+    inorder(root->left,nil);
+    printf("%d ",root->val);
+    inorder(root->right,nil);
+  }
+}
+
+void postorder(Node* root,Node* nil)
+{
+  if(root!=nil)
+  {
+    postorder(root->left,nil);
+    postorder(root->right,nil);
+    printf("%d ",root->val);
+  }
+}
+
+void traversal(RBTree* tree,Traversal mode)
+{
+  if(mode == PREORDER) preorder(tree->root,tree->NIL);
+  else if(mode == INORDER) inorder(tree->root,tree->NIL);
+  else if(mode == POSTORDER) postorder(tree->root,tree->NIL);
 }
