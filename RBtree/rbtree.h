@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <unistd.h>
 
 typedef enum _trav
 {
@@ -192,15 +193,205 @@ void insertion(RBTree* tree, int num)
   checkRules(tree,p,newNode);
 }
 
-
-void deletion()
+Node* getPredecessor(RBTree* tree,Node* c)
 {
-  //TODO
+  Node* p = c->parent;
+  while(c!=tree->NIL)
+  {
+    p = c;
+    c = c->right;
+  }
+  return p;
+}
+
+Node* find(RBTree* tree,int num)
+{
+  Node* c = tree->root;
+  while(c!=tree->NIL)
+  {
+    if(num>c->val) c = c->right;
+    else if(num<c->val) c = c->left;
+    else break;
+  }
+  if(c == tree->NIL) return NULL;
+  else return c;
+}
+
+void handleDoubleD(RBTree* tree,Node* p,Node* t,bool chk)
+{
+  Node* s = NULL;
+  Node* tmp = NULL;
+
+  //printf("%d fdfafa\n",p->val);
+
+  if(chk) s = p->left;
+  else s = p->right;
+
+  if(s->color == RED)
+  {
+    s->color = BLACK;
+    p->color = RED;
+
+    if(chk) rightRotation(p, s, tree);
+    else leftRotation(p, s, tree);
+
+    handleDoubleD(tree,p,t,chk);
+  }
+  else  //sibling is BLACK
+  {
+    if(s->left->color == BLACK && s->right->color == BLACK)
+    {
+      s->color = RED;
+      if(p->color == RED) p->color = BLACK;
+      else
+      {
+        if(p->parent != NULL)
+        {
+          if(p->parent->right == p) handleDoubleD(tree,p->parent,p,true);
+          else handleDoubleD(tree,p->parent,p,false);
+        }
+      }
+    }
+    else if(s->left->color == RED && s->right->color == BLACK)
+    {
+      s->color = RED;
+      s->left->color = BLACK;
+      Node* l = s->left;
+      if(chk) rightRotation(p,s,tree);
+      else
+      {
+        rightRotation(s,l,tree);
+        leftRotation(p,l,tree);
+      }
+    }
+    else if(s->right->color == RED)
+    {
+      s->color = p->color;
+      p->color = BLACK;
+      s->right->color = BLACK;
+      if(chk) rightRotation(p,s,tree);
+      else leftRotation(p,s,tree);
+      //revision neeeded!! (maybe?)
+    }
+  }
+}
+
+void deletion(RBTree* tree,int num)
+{
+  Node* target = find(tree,num);
+  if(target == NULL)
+  {
+    puts("No Such Node");
+    return;
+  }
+  //node that is going to get deleted is predecessor!
+  Node* p = target->parent;
+  //if(num == 1) printf("%d afdsaf\n",p->val);
+
+  bool chk = true;  //right child --> true
+  if(p!=NULL)
+    if(p->left == target)
+      chk = false;
+  //if(num == 2) printf("%d afdsaf\n",chk);
+
+  if(target->left == tree->NIL && target->right == tree->NIL)
+  {
+    if(target->color == RED)  //never root --> parent exists
+    {
+      if(chk) p->right = tree->NIL;
+      else p->left = tree->NIL;
+    }
+    else
+    {
+      if(target == tree->root) tree->root = NULL;
+      else
+      {
+        if(chk) p->right = tree->NIL;
+        else p->left = tree->NIL;
+        handleDoubleD(tree,p,tree->NIL,chk); //target is not root
+      }
+    }
+    free(target);
+  }
+  else if(target->left == tree->NIL)
+  {
+    if(target->right->color == RED)
+    {
+      target->right->color = BLACK;
+      if(target!=tree->root)
+      {
+        if(chk) p->right = target->right;
+        else p->left = target->right;
+      }
+      else tree->root = target->right;
+      target->right->parent = p;
+    }
+    else
+    {
+      if(target == tree->root)
+      {
+        tree->root = target->right;
+        tree->root->color = BLACK;
+      }
+      else
+      {
+        if(chk) p->right = target->right;
+        else p->left = target->right;
+        handleDoubleD(tree,p,target->right,chk);
+      }
+    }
+    free(target);
+  }
+  else if(target->right == tree->NIL)
+  {
+    if(target->left->color == RED)
+    {
+      target->left->color = BLACK;
+      if(target!=tree->root)
+      {
+        if(chk) p->right = target->left;
+        else p->left = target->left;
+      }
+      else tree->root = target->left;
+      target->left->parent = p;
+    }
+    else
+    {
+      if(target == tree->root)
+      {
+        tree->root = target->left;
+        tree->root->color = BLACK;
+      }
+      else
+      {
+        if(chk) p->right = target->left;
+        else p->left = target->left;
+        handleDoubleD(tree,p,target->left,chk);
+      }
+    }
+    free(target);
+  }
+  else
+  {
+    Node* pred = getPredecessor(tree,target->left);
+    //printf("%d fafad\n",pred->parent->val);
+    target->val = pred->val;
+    bool tmp = true;
+    if(pred->parent != target) pred->parent->right = tree->NIL;
+    else
+    {
+      pred->parent->left = tree->NIL;
+      tmp = false;
+    }
+    if(pred->color == BLACK) handleDoubleD(tree,pred->parent,tree->NIL,tmp);
+    //if red do nothing
+    free(pred);
+  }
 }
 
 void preorder(Node* root,Node* nil)
 {
-  if(root!=nil)
+  if(root!=nil && root!=NULL)
   {
     if(root->color == RED) printf("%d-R ",root->val);
     else printf("%d-B ",root->val);
@@ -211,7 +402,7 @@ void preorder(Node* root,Node* nil)
 
 void inorder(Node* root,Node* nil)
 {
-  if(root!=nil)
+  if(root!=nil && root!=NULL)
   {
     inorder(root->left,nil);
     if(root->color == RED) printf("%d-R ",root->val);
@@ -222,7 +413,7 @@ void inorder(Node* root,Node* nil)
 
 void postorder(Node* root,Node* nil)
 {
-  if(root!=nil)
+  if(root!=nil && root!=NULL)
   {
     postorder(root->left,nil);
     postorder(root->right,nil);
@@ -236,8 +427,8 @@ void traversal(RBTree* tree,Traversal mode)
   if(mode == PREORDER) preorder(tree->root,tree->NIL);
   else if(mode == INORDER) inorder(tree->root,tree->NIL);
   else if(mode == POSTORDER) postorder(tree->root,tree->NIL);
+  else puts("Wrong Mode!");
 }
-
 
 void display(RBTree* tree)
 {
@@ -252,5 +443,4 @@ void display(RBTree* tree)
   puts("postorder");
   traversal(tree,POSTORDER);
   puts("");
-
 }
