@@ -45,9 +45,7 @@ RBTree* initTree()
   RBTree* tree = (RBTree*)malloc(sizeof(RBTree));
   Node* nil = makeNode(INT_MIN);
   nil->color = BLACK;
-  //nil->left = nil;
-  //nil->right = nil;
-
+  
   tree->root = nil;
   tree->NIL = nil;
   return tree;
@@ -222,8 +220,6 @@ void handleDoubleD(RBTree* tree,Node* p,Node* t,bool chk)
   Node* s = NULL;
   Node* tmp = NULL;
 
-  //printf("%d fdfafa\n",p->val);
-
   if(chk) s = p->left;
   else s = p->right;
 
@@ -271,7 +267,6 @@ void handleDoubleD(RBTree* tree,Node* p,Node* t,bool chk)
       s->right->color = BLACK;
       if(chk) rightRotation(p,s,tree);
       else leftRotation(p,s,tree);
-      //revision neeeded!! (maybe?)
     }
   }
 }
@@ -286,13 +281,11 @@ void deletion(RBTree* tree,int num)
   }
   //node that is going to get deleted is predecessor!
   Node* p = target->parent;
-  //if(num == 1) printf("%d afdsaf\n",p->val);
 
   bool chk = true;  //right child --> true
   if(p!=NULL)
     if(p->left == target)
       chk = false;
-  //if(num == 2) printf("%d afdsaf\n",chk);
 
   if(target->left == tree->NIL && target->right == tree->NIL)
   {
@@ -374,7 +367,6 @@ void deletion(RBTree* tree,int num)
   else
   {
     Node* pred = getPredecessor(tree,target->left);
-    //printf("%d fafad\n",pred->parent->val);
     target->val = pred->val;
     bool tmp = true;
     if(pred->parent != target) pred->parent->right = tree->NIL;
