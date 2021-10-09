@@ -11,23 +11,7 @@ int main(void)
   RBTree* Tree = initTree();
 
   for(int i=0;i<len;i++) insertion(Tree,arr[i]);
-
-
-
-  // one for color means black
-  puts("preorder");
-  traversal(Tree,PREORDER);
-  puts("");
-
-  puts("inorder");
-  traversal(Tree,INORDER);
-  puts("");
-
-  puts("postorder");
-  traversal(Tree,POSTORDER);
-  puts("");
-
-
+  display(tree);
   //for(int i=0;i<len;i++) deletion(Tree,arr[i]);
 
   return 0;

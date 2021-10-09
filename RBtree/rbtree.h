@@ -237,3 +237,20 @@ void traversal(RBTree* tree,Traversal mode)
   else if(mode == INORDER) inorder(tree->root,tree->NIL);
   else if(mode == POSTORDER) postorder(tree->root,tree->NIL);
 }
+
+
+void display(RBTree* tree)
+{
+  puts("preorder");
+  traversal(tree,PREORDER);
+  puts("");
+
+  puts("inorder");
+  traversal(tree,INORDER);
+  puts("");
+
+  puts("postorder");
+  traversal(tree,POSTORDER);
+  puts("");
+
+}
