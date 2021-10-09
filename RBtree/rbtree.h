@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 typedef enum _trav
 {
@@ -41,7 +42,8 @@ Node* makeNode(int num)
 RBTree* initTree()
 {
   RBTree* tree = (RBTree*)malloc(sizeof(RBTree));
-  Node* nil = makeNode(0);
+  Node* nil = makeNode(INT_MIN);
+  nil->color = BLACK;
   //nil->left = nil;
   //nil->right = nil;
 
@@ -52,7 +54,8 @@ RBTree* initTree()
 
 bool chkDRED(Node* p, Node*c)
 {
-  if(p->color == RED && p->color == c->color) return true;
+  if(p==NULL) return false;
+  else if(p->color == RED && p->color == c->color) return true;
   else return false;
 }
 
@@ -139,12 +142,17 @@ void checkRules(RBTree* tree,Node* p,Node* c)
     }
     else  //case 1
     {
-        //TODO
+        gp->color = RED;
+        p->color = BLACK;
+        u->color = BLACK;
+
+        if(tree->root->color == RED) tree->root->color = BLACK;
+        if(gp->parent!=NULL) checkRules(tree,gp->parent,gp);
     }
   }
 }
 
-void insert(RBTree* tree, int num)
+void insertion(RBTree* tree, int num)
 {
   Node* newNode = makeNode(num);
   Node* p = NULL;
@@ -165,6 +173,7 @@ void insert(RBTree* tree, int num)
       flag = false;
     }
   }
+
   newNode->parent = p;
   newNode->left = tree->NIL;
   newNode->right = tree->NIL;
@@ -193,7 +202,8 @@ void preorder(Node* root,Node* nil)
 {
   if(root!=nil)
   {
-    printf("%d ",root->val);
+    if(root->color == RED) printf("%d-R ",root->val);
+    else printf("%d-B ",root->val);
     preorder(root->left,nil);
     preorder(root->right,nil);
   }
@@ -204,7 +214,8 @@ void inorder(Node* root,Node* nil)
   if(root!=nil)
   {
     inorder(root->left,nil);
-    printf("%d ",root->val);
+    if(root->color == RED) printf("%d-R ",root->val);
+    else printf("%d-B ",root->val);
     inorder(root->right,nil);
   }
 }
@@ -215,7 +226,8 @@ void postorder(Node* root,Node* nil)
   {
     postorder(root->left,nil);
     postorder(root->right,nil);
-    printf("%d ",root->val);
+    if(root->color == RED) printf("%d-R ",root->val);
+    else printf("%d-B ",root->val);
   }
 }
 
