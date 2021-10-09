@@ -217,7 +217,7 @@ Node* find(RBTree* tree,int num)
   else return c;
 }
 
-void handleDoubleD(RBTree* tree,Node* p,Node* t,bool chk)
+void handleDoubleB(RBTree* tree,Node* p,Node* t,bool chk)
 {
   Node* s = NULL;
   Node* tmp = NULL;
@@ -233,7 +233,7 @@ void handleDoubleD(RBTree* tree,Node* p,Node* t,bool chk)
     if(chk) rightRotation(p, s, tree);
     else leftRotation(p, s, tree);
 
-    handleDoubleD(tree,p,t,chk);
+    handleDoubleB(tree,p,t,chk);
   }
   else  //sibling is BLACK
   {
@@ -245,8 +245,8 @@ void handleDoubleD(RBTree* tree,Node* p,Node* t,bool chk)
       {
         if(p->parent != NULL)
         {
-          if(p->parent->right == p) handleDoubleD(tree,p->parent,p,true);
-          else handleDoubleD(tree,p->parent,p,false);
+          if(p->parent->right == p) handleDoubleB(tree,p->parent,p,true);
+          else handleDoubleB(tree,p->parent,p,false);
         }
       }
     }
@@ -304,7 +304,7 @@ void deletion(RBTree* tree,int num)
         if(chk) p->right = tree->NIL;
         else p->left = tree->NIL;
 
-        handleDoubleD(tree,p,tree->NIL,chk); //target is not root
+        handleDoubleB(tree,p,tree->NIL,chk); //target is not root
       }
     }
     free(target);
@@ -333,7 +333,7 @@ void deletion(RBTree* tree,int num)
       {
         if(chk) p->right = target->right;
         else p->left = target->right;
-        handleDoubleD(tree,p,target->right,chk);
+        handleDoubleB(tree,p,target->right,chk);
       }
     }
     free(target);
@@ -362,7 +362,7 @@ void deletion(RBTree* tree,int num)
       {
         if(chk) p->right = target->left;
         else p->left = target->left;
-        handleDoubleD(tree,p,target->left,chk);
+        handleDoubleB(tree,p,target->left,chk);
       }
     }
     free(target);
@@ -385,10 +385,10 @@ void deletion(RBTree* tree,int num)
 
     if(pred->color == BLACK && pred->left->color == BLACK)
     {
-      handleDoubleD(tree,pred->parent,tree->NIL,tmp);
+      handleDoubleB(tree,pred->parent,tree->NIL,tmp);
       pred->left->color = BLACK;
     }
-    
+
     //if red do nothing
     free(pred);
   }
