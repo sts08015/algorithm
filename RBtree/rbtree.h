@@ -29,6 +29,8 @@ typedef struct _rbtree
   Node* NIL;
 }RBTree;
 
+void display(RBTree* tree);
+
 Node* makeNode(int num)
 {
   Node* node = (Node*)malloc(sizeof(Node));
@@ -45,7 +47,7 @@ RBTree* initTree()
   RBTree* tree = (RBTree*)malloc(sizeof(RBTree));
   Node* nil = makeNode(INT_MIN);
   nil->color = BLACK;
-  
+
   tree->root = nil;
   tree->NIL = nil;
   return tree;
@@ -301,6 +303,7 @@ void deletion(RBTree* tree,int num)
       {
         if(chk) p->right = tree->NIL;
         else p->left = tree->NIL;
+
         handleDoubleD(tree,p,tree->NIL,chk); //target is not root
       }
     }
@@ -369,13 +372,23 @@ void deletion(RBTree* tree,int num)
     Node* pred = getPredecessor(tree,target->left);
     target->val = pred->val;
     bool tmp = true;
-    if(pred->parent != target) pred->parent->right = tree->NIL;
+    if(pred->parent != target)
+    {
+      pred->parent->right = tree->NIL;
+    }
     else
     {
-      pred->parent->left = tree->NIL;
+      pred->parent->left = pred->left;
+      pred->left->parent = pred->parent;
       tmp = false;
     }
-    if(pred->color == BLACK) handleDoubleD(tree,pred->parent,tree->NIL,tmp);
+
+    if(pred->color == BLACK && pred->left->color == BLACK)
+    {
+      handleDoubleD(tree,pred->parent,tree->NIL,tmp);
+      pred->left->color = BLACK;
+    }
+    
     //if red do nothing
     free(pred);
   }
