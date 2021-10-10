@@ -259,8 +259,9 @@ void handleDoubleB(RBTree* tree,Node* p,Node* t,bool chk)
       else
       {
         rightRotation(s,l,tree);
-        leftRotation(p,l,tree);
+        //leftRotation(p,l,tree);
       }
+      handleDoubleB(tree,p,t,chk);
     }
     else if(s->right->color == RED)
     {

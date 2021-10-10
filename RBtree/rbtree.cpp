@@ -7,15 +7,15 @@ int main(void)
   const int brr[] = {8,18,5,15,17,25,40,80};
   const int crr[] = {11,2,14,1,7,5,8,15};
 
-  int len = sizeof(brr)/sizeof(int);
+  int len = sizeof(arr)/sizeof(int);
 
   RBTree* Tree = initTree();
 
-  for(int i=0;i<len;i++) insertion(Tree,brr[i]);
+  for(int i=0;i<len;i++) insertion(Tree,arr[i]);
 
   display(Tree);
 
-  for(int i=0;i<len;i++) deletion(Tree,brr[i]);
+  for(int i=0;i<len;i++) deletion(Tree,arr[i]);
 
   puts("\n");
   display(Tree);
