@@ -42,7 +42,8 @@ void KMP(char* text, char* pattern)
             j++;
             i++;
         }
-        if (j == M) {
+        if (j == M) 
+        {
             printf("Index : %d\n", i - j);
             j = pps[j - 1];
         }
